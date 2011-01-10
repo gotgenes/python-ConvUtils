@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 from distutils.core import setup
 
 setup(
@@ -15,7 +18,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Topic :: Software Development :: Libraries'
-    ]
+    ],
     description=("A library of convenient utility functions and pure "
         "Python data structures"),
     long_description=open('README.txt').read(),
