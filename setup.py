@@ -10,7 +10,7 @@ setup(
     author_email='chris.lasher@gmail.com',
     packages=['convutils', 'convutils.test'],
     url='http://pypi.python.org/pypi/ConvUtils/',
-    license='LICENSE.txt',
+    license='MIT License',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
