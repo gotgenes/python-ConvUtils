@@ -20,7 +20,7 @@ setup(
         'Topic :: Software Development :: Libraries'
     ],
     description=("A library of convenient utility functions and pure "
-        "Python data structures"),
-    long_description=open('README.txt').read(),
+        "Python data structures."),
+    long_description=open('README.rst').read(),
 )
 
