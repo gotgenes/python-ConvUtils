@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name='ConvUtils',
-    version='1.0',
+    version='1.0.1',
     author='Christopher D. Lasher',
     author_email='chris.lasher@gmail.com',
     packages=['convutils', 'convutils.test'],

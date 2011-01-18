@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""
-Tests for convstructs.py
+# Copyright (c) 2011 Christopher D. Lasher
+#
+# This software is released under the MIT License. Please see
+# LICENSE.txt for details.
 
-"""
+
+"""Tests for convstructs.py"""
 
 __author__ = 'Chris Lasher'
 __email__ = 'chris DOT lasher <AT> gmail DOT com'

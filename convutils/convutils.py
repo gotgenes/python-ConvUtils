@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+# Copyright (c) 2011 Christopher D. Lasher
+#
+# This software is released under the MIT License. Please see
+# LICENSE.txt for details.
+
+
 """A collection of common utilities and convenient functions."""
 
 __author__ = 'Chris Lasher'
