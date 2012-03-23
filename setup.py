@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name='ConvUtils',
-    version='1.0.1',
+    version='1.1',
     author='Christopher D. Lasher',
     author_email='chris.lasher@gmail.com',
     packages=['convutils', 'convutils.test'],
@@ -16,7 +16,9 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Libraries'
     ],
     description=("A library of convenient utility functions and pure "
