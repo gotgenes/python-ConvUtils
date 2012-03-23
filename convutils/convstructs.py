@@ -171,11 +171,10 @@ class TwoWaySetDict(dict):
         """Performs a reverse-lookup to see if an item exists among the
         sets in the dictionary's values.
 
-        Returns `True` if the item is among the values, or `False` if
-        the item is not.
+        Returns ``True`` if the item is among the values, or ``False``
+        if the item is not.
 
-        :Parameters:
-        - `item`: an item that may be among the `set`s in the
+        :param item: an item that may be among the ``set``s in the
           main dictionary's values
 
         """
@@ -189,15 +188,14 @@ class TwoWaySetDict(dict):
         """See if an item in the values of the dictionary has a reverse
         mapping to an item.
 
-        Raises a `KeyError` if the item is not present in any of the
+        Raises a ``KeyError`` if the item is not present in any of the
         values.
 
         Returns True if the item has a reverse mapping to the key, or
         False if the item has no reverse mapping to the key.
 
-        :Parameters:
-        - `item`: an item in one of the value sets
-        - `key`: a key of the dictionary
+        :param item: an item in one of the value sets
+        :param key: a key of the dictionary
 
         """
         if key in self._reverse_dict[item]:
@@ -207,14 +205,13 @@ class TwoWaySetDict(dict):
 
 
     def get_item_keys(self, item):
-        """Returns a `set` of all keys whose `set` values the item is
-        present in.
+        """Returns a ``set`` of all keys whose ``set`` values the item
+        is present in.
 
-        Raises a `KeyError` if the item is not present in any of the
+        Raises a ``KeyError`` if the item is not present in any of the
         values.
 
-        :Parameters:
-        - `item`: an item in one of the value sets
+        :param item: an item in one of the value sets
 
         """
         return self._reverse_dict[item]
@@ -223,11 +220,10 @@ class TwoWaySetDict(dict):
     def add_item(self, key, item):
         """Adds a item to the set belonging to the key.
 
-        Raises a `KeyError` if the key does not exist.
+        Raises a ``KeyError`` if the key does not exist.
 
-        :Parameters:
-        - `key`: a key in the main dictionary
-        - `item`: an item to be added to the set belonging to the key
+        :param key: a key in the main dictionary
+        :param item: an item to be added to the set belonging to the key
 
         """
         self[key].add(item)
@@ -240,12 +236,11 @@ class TwoWaySetDict(dict):
     def remove_item(self, key, item):
         """Removes an item from the set belonging to the key.
 
-        Raises a `KeyError` if the key does not exist, or if the item
+        Raises a ``KeyError`` if the key does not exist, or if the item
         is not present in the set belonging to the key.
 
-        :Parameters:
-        - `key`: a key in the main dictionary
-        - `item`: an item to be removed from the set belonging to the
+        :param key: a key in the main dictionary
+        :param item: an item to be removed from the set belonging to the
           key
 
         """
@@ -254,14 +249,13 @@ class TwoWaySetDict(dict):
 
 
     def remove_item_from_all_keys(self, item):
-        """Removes an item from all `set` values in the main dictionary
-        to which it belongs.
+        """Removes an item from all ``set`` values in the main
+        dictionary to which it belongs.
 
-        Raises a `KeyError` if the item is not present in any of the
+        Raises a ``KeyError`` if the item is not present in any of the
         values.
 
-        :Parameters:
-        - `item`: an item to be removed from all sets of values
+        :param item: an item to be removed from all sets of values
 
         """
         for key in self._reverse_dict[item]:

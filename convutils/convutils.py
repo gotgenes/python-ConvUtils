@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2011 Christopher D. Lasher
+# Copyright (c) 2011-2012 Christopher D. Lasher
 #
 # This software is released under the MIT License. Please see
 # LICENSE.txt for details.
@@ -18,8 +18,8 @@ import os.path
 
 
 class ExcelTabNewlineDialect(csv.excel_tab):
-    """A dialect similar to `csv.excel_tab`, but uses `\n` as the line
-    terminator.
+    """A dialect similar to :py:class:`csv.excel_tab`, but uses
+    ``'\\n'`` as the line terminator.
 
     """
     lineterminator = '\n'
@@ -28,12 +28,11 @@ class ExcelTabNewlineDialect(csv.excel_tab):
 def make_csv_reader(csv_fileh, headers=True, dialect=None, *args, **kwargs):
     """Creates a CSV reader given a CSV file.
 
-    :Parameters:
-    - `csv_fileh`: a file handle to a CSV file
-    - `headers`: whether or not the file has headers [DEFAULT: `True`]
-    - `dialect`: a `csv.Dialect` instance
-    - `*args`: passed on to the reader
-    - `**kwargs`: passed on to the reader
+    :param csv_fileh: a file handle to a CSV file
+    :param headers: whether or not the file has headers
+    :param dialect: a :py:class:`csv.Dialect` instance
+    :param *args: passed on to the reader
+    :param **kwargs: passed on to the reader
 
     """
     if dialect is None:
@@ -62,16 +61,14 @@ def make_csv_dict_writer(
     line to the file.
 
     NOTE: In Python 2.7 and 3.2, this will be obsolesced by the
-    `csv.DictWriter.writeheader()` method. See
+    :py:meth:`csv.DictWriter.writeheader` method. See
     http://bugs.python.org/issue1537721 for more detail.
 
-    :Parameters:
-    - `csv_fileh`: a file handle to a CSV file opened in write mode
-    - `fieldnames`: a list of field names for the columns
-    - `dialect`: a `csv.Dialect` instance [DEFAULT:
-      `ExcelTabNewlineDialect`]
-    - `*args`: passed on to `DictWriter()`
-    - `**kwargs`: passed on to `DictWriter()`
+    :param csv_fileh: a file handle to a CSV file opened in write mode
+    :param fieldnames: a list of field names for the columns
+    :param dialect: a :py:class:`csv.Dialect` instance
+    :param *args: passed on to :py:class:`csv.DictWriter()`
+    :param **kwargs: passed on to :py:class:`csv.DictWriter()`
 
     """
     csv_writer = csv.DictWriter(csv_fileh, fieldnames, dialect=dialect,
@@ -87,9 +84,8 @@ def append_to_file_base_name(path, addition):
     For example, with a path of `/foo/bar/spam.txt`, and an addition of
     `-eggs`, the returned path will be `/foo/bar/spam-eggs.txt`.
 
-    :Parameters:
-    - `path`: a file path (does not have to actually exist)
-    - `addition`: text to append to the base name
+    :param path: a file path (does not have to actually exist)
+    :param addition: text to append to the base name
 
     """
     basename, extension = os.path.splitext(path)
@@ -100,10 +96,8 @@ def append_to_file_base_name(path, addition):
 def count_lines(fileh):
     """Determines the number of lines in a text file.
 
-    Returns a non-negative integer.
-
-    :Parameters:
-    - `fileh`: a file handle
+    :param fileh: a file handle
+    :returns: a non-negative integer.
 
     """
     num_lines = 0
@@ -128,12 +122,10 @@ def split_file_by_parts(filename, num_parts, has_header=False):
     and 5 parts are asked, the first 4 parts will have 32 lines, and the
     final fifth part will have 28).
 
-    :Parameters:
-    - `filename`: the path to a file
-    - `num_parts`: number of parts to divide the file into
-    - `has_header`: whether the original file has a header line; if
-      `True`, header will be replicated in all new files [default:
-      `False`]
+    :param filename: the path to a file
+    :param num_parts: number of parts to divide the file into
+    :param has_header: whether the original file has a header line; if
+        ``True``, header will be replicated in all new files
 
     """
     fileh = open(filename)
@@ -162,13 +154,11 @@ def split_file_by_num_lines(filename, lines_per_part, has_header=False):
     BASENAME and EXTENSION are derived from the original file, and NUM
     is the iteration of the split during which the new file was created.
 
-    :Parameters:
-    - `filename`: the path to a file
-    - `lines_per_part`: number of lines per new file (excluding header
-      line, if present)
-    - `has_header`: whether the original file has a header line; if
-      `True`, header will be replicated in all new files [default:
-      `False`]
+    :param filename: the path to a file
+    :param lines_per_part: number of lines per new file (excluding header
+        line, if present)
+    :param has_header: whether the original file has a header line; if
+        ``True``, header will be replicated in all new files
 
     """
     fileh = open(filename)
@@ -199,14 +189,12 @@ def split_file_by_num_lines(filename, lines_per_part, has_header=False):
 
 
 def column_args_to_indices(col_str):
-    """
-    Converts a string representing columns to actual indices.
+    """Converts a string representing columns to actual indices.
 
     Note that the text indices should be 1-indexed, and the returned
     indices and slices will be 0-indexed.
 
-    :Parameters:
-    - `col_str`: a string of column designations (e.g., '1-4,6,8')
+    :param col_str: a string of column designations (e.g., ``'1-4,6,8'``)
 
     """
 
