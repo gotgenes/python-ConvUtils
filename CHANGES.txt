@@ -1,2 +1,19 @@
-v1.0.1 2011-01-18 -- Added imports of modules into package __init__.py.
-v1.0 2011-01-10 -- Initial release.
+v1.1 2012-03-23
+===============
+
+* Changed docstrings to use Sphinx info field lists.
+* Added ``cumsum``
+* Added ``sample_list_dict`` and ``sample_list_dict_low_mem``.
+
+
+v1.0.1 2011-01-18
+=================
+
+* Added imports of modules into package __init__.py.
+
+
+v1.0 2011-01-10
+===============
+
+* Initial release.
+

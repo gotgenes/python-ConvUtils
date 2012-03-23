@@ -13,8 +13,12 @@ __author__ = 'Chris Lasher'
 __email__ = 'chris DOT lasher <AT> gmail DOT com'
 
 
+import bisect
+import collections
 import csv
+import itertools
 import os.path
+import random
 
 
 class ExcelTabNewlineDialect(csv.excel_tab):
@@ -209,4 +213,96 @@ def column_args_to_indices(col_str):
 
     return indices
 
+
+def cumsum(iterable):
+    """Calculates the cumulative sum at each index of an iterable.
+
+    Taken from http://stackoverflow.com/a/4844870/38140
+
+    :param iterable: an iterable object
+    :yields: the cumulative sum up to the given index
+
+    """
+    iterable = iter(iterable)
+    s = iterable.next()
+    yield s
+    for c in iterable:
+        s = s + c
+        yield s
+
+
+def sample_list_dict(d, k):
+    """Given a dictionary with lists as values, samples a given number
+    of sub-elements uniformly at random.
+
+    Consumes less memory than :func:`dict_list_random_sample`.
+
+    :param d: a dictionary whose values are lists or other enumerable,
+        iterable types
+    :param k: number of sub-elements in the returned dictionary
+    :returns: a dictionary with the given number of sub-elements
+
+    """
+    # Flatten the dictionary.
+    flat_dict = []
+    for key, val in d.items():
+        for elem in val:
+            flat_dict.append((key, elem))
+    sampled_values = random.sample(flat_dict, k)
+    sampled_d = collections.defaultdict(list)
+    for key, elem in sampled_values:
+        sampled_d[key].append(elem)
+    return dict(sampled_d)
+
+
+def sample_list_dict_low_mem(d, k):
+    """Given a dictionary with lists as values, samples a given number
+    of sub-elements uniformly at random.
+
+    Consumes less memory than :func:`dict_list_random_sample` for large
+    dictionaries.
+
+    :param d: a dictionary whose values are lists or other enumerable,
+        iterable types
+    :param k: number of sub-elements in the returned dictionary
+    :returns: a dictionary with the given number of sub-elements
+
+    """
+    # Let's say our data structure is
+    #     d = {
+    #         'key1': [1, 5, 9],
+    #         'key2': [6, 42],
+    #         'key3': [7, 9001]
+    #     }
+    #
+    # Conceptually, we will be flattening this data structure to
+    # something like
+    #
+    #     [('key1', 1), ('key1', 5), ('key1', 9), ('key2', 6),
+    #      ('key2', 42), ('key3', 7), ('key3', 9001)]
+    #
+    # but we are retaining the data structure as is and instead
+    # flattening the index into it.
+
+    # Change d.keys() to list(d.keys()) in Python 3.
+    keys = d.keys()                 # keys == ['key1', 'key2', 'key3']
+    cum_index_bins = list(cumsum(len(v) for v in d.values()))
+    # We'll shift all the indices over by one so that we can pull a
+    # subtraction trick below to get the sub-index.
+    cum_index_bins.insert(0, 0)     # cum_index_bins == [0, 3, 5, 7]
+
+    total_num_elements = cum_index_bins[-1]     # total_num_elements == 7
+    sampled_indices = random.sample(range(total_num_elements), k)
+    sampled_d = collections.defaultdict(list)
+    for index in sampled_indices:
+        # say index == 3 (the fourth item, ('key2', 6) in this case)
+        cum_index = bisect.bisect(cum_index_bins, index)    # cum_index == 2
+        key_index = cum_index - 1   # key_index == 1
+        key = keys[key_index]       # key == 'key2'
+        # A trick to get the index into the list of d at that key.
+        value_index = (index - cum_index_bins[key_index])   # value_index == (3 - 3) = 0
+        actual_value = d[key][value_index]  # actual_value == 6
+        sampled_d[key].append(actual_value)
+
+    return dict(sampled_d)
 
