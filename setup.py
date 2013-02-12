@@ -8,7 +8,7 @@ setup(
     version='1.1',
     author='Christopher D. Lasher',
     author_email='chris.lasher@gmail.com',
-    packages=['convutils', 'convutils.test'],
+    packages=['convutils', 'convutils.tests'],
     url='http://pypi.python.org/pypi/ConvUtils/',
     license='MIT License',
     classifiers=[

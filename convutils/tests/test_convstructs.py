@@ -15,13 +15,7 @@ __email__ = 'chris DOT lasher <AT> gmail DOT com'
 
 import unittest
 
-import os
-import sys
-
-parpath = os.path.join(os.path.dirname(__file__), os.pardir)
-sys.path.insert(0, os.path.abspath(parpath))
-
-import convstructs
+from convutils import convstructs
 
 
 class TwoWaySetDictTests(unittest.TestCase):
