@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2011 Christopher D. Lasher
+# Copyright (c) 2011, 2013 Christopher D. Lasher
 #
 # This software is released under the MIT License. Please see
 # LICENSE.txt for details.
 
-
+from ._version import __version__
 import convutils
 import convstructs
+
