@@ -2,6 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 from distutils.core import setup
+try:  # Python 3
+  from distutils.command.build_py import build_py_2to3 as build_py
+except ImportError:  # Python 2
+  from distutils.command.build_py import build_py
 
 import re
 import os
@@ -19,24 +23,26 @@ else:
     )
 
 setup(
-    name='ConvUtils',
-    version=VERSTR,
-    author='Christopher D. Lasher',
-    author_email='chris.lasher@gmail.com',
-    packages=['convutils', 'convutils.tests'],
-    url='http://pypi.python.org/pypi/ConvUtils/',
-    license='MIT License',
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Topic :: Software Development :: Libraries'
-    ],
-    description=("A library of convenient utility functions and pure "
-        "Python data structures."),
-    long_description=open('README.rst').read(),
+        cmdclass={'build_py': build_py},
+        name='ConvUtils',
+        version=VERSTR,
+        author='Christopher D. Lasher',
+        author_email='chris.lasher@gmail.com',
+        packages=['convutils', 'convutils.tests'],
+        url='http://pypi.python.org/pypi/ConvUtils/',
+        license='MIT License',
+        classifiers=[
+            'Development Status :: 3 - Alpha',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: MIT License',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.2',
+            'Programming Language :: Python :: 3.3',
+            'Topic :: Software Development :: Libraries'
+        ],
+        description=("A library of convenient utility functions and "
+                     "pure Python data structures."),
+        long_description=open('README.rst').read(),
 )
 

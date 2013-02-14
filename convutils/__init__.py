@@ -7,6 +7,5 @@
 # LICENSE.txt for details.
 
 from ._version import __version__
-import convutils
-import convstructs
+from . import convstructs, convutils
 

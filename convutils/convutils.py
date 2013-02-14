@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2011-2012 Christopher D. Lasher
+# Copyright (c) 2011-2013 Christopher D. Lasher
 #
 # This software is released under the MIT License. Please see
 # LICENSE.txt for details.
@@ -9,9 +9,7 @@
 
 """A collection of common utilities and convenient functions."""
 
-__author__ = 'Chris Lasher'
-__email__ = 'chris DOT lasher <AT> gmail DOT com'
-
+from __future__ import unicode_literals
 
 import bisect
 import collections
@@ -21,64 +19,103 @@ import os.path
 import random
 
 
-class ExcelTabNewlineDialect(csv.excel_tab):
-    """A dialect similar to :py:class:`csv.excel_tab`, but uses
-    ``'\\n'`` as the line terminator.
+class SimpleTsvDialect(csv.excel_tab):
+    """A simple tab-separated values dialect.
+
+
+    This Dialect is similar to :class:`csv.excel_tab`, but uses
+    ``'\\n'`` as the line terminator and does no special quoting.
 
     """
     lineterminator = '\n'
+    quoting = csv.QUOTE_NONE
 
 
-def make_csv_reader(csv_fileh, headers=True, dialect=None, *args, **kwargs):
+csv.register_dialect('simple_tsv', SimpleTsvDialect)
+
+
+def make_csv_reader(csvfile, headers=True, dialect=None, *args,
+                    **kwargs):
     """Creates a CSV reader given a CSV file.
 
-    :param csv_fileh: a file handle to a CSV file
+    :param csvfile: a file handle to a CSV file
     :param headers: whether or not the file has headers
-    :param dialect: a :py:class:`csv.Dialect` instance
+    :param dialect: a :class:`csv.Dialect` instance
     :param *args: passed on to the reader
     :param **kwargs: passed on to the reader
 
     """
     if dialect is None:
         try:
-            dialect = csv.Sniffer().sniff(csv_fileh.read(1024))
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
         except csv.Error:
-            dialect = ExcelTabNewlineDialect
-        csv_fileh.seek(0)
+            dialect = csv.excel
+        csvfile.seek(0)
     if headers:
-        csv_reader = csv.DictReader(csv_fileh, dialect=dialect, *args,
+        csv_reader = csv.DictReader(csvfile, dialect=dialect, *args,
                 **kwargs)
     else:
-        csv_reader = csv.reader(csv_fileh, dialect=dialect, *args,
+        csv_reader = csv.reader(csvfile, dialect=dialect, *args,
                 **kwargs)
     return csv_reader
 
 
+def make_simple_tsv_reader(tsvfile, headers=True, *args, **kwargs):
+    """Creates a CSV reader given a CSV file.
+
+    :param tsvfile: a file handle to a TSV file
+    :param headers: whether or not the file has headers
+    :param *args: passed on to the reader
+    :param **kwargs: passed on to the reader
+
+    """
+    return make_csv_reader(tsvfile, headers, dialect=SimpleTsvDialect,
+                           *args, **kwargs)
+
+
 def make_csv_dict_writer(
-        csv_fileh,
+        csvfile,
         fieldnames,
-        dialect=ExcelTabNewlineDialect,
         *args,
         **kwargs
     ):
     """Creates a `csv.DictWriter` instance and also writes the header
     line to the file.
 
-    NOTE: In Python 2.7 and 3.2, this will be obsolesced by the
-    :py:meth:`csv.DictWriter.writeheader` method. See
-    http://bugs.python.org/issue1537721 for more detail.
-
-    :param csv_fileh: a file handle to a CSV file opened in write mode
+    :param csvfile: a file handle to a CSV file opened in write mode
     :param fieldnames: a list of field names for the columns
-    :param dialect: a :py:class:`csv.Dialect` instance
-    :param *args: passed on to :py:class:`csv.DictWriter()`
-    :param **kwargs: passed on to :py:class:`csv.DictWriter()`
+    :param dialect: a :class:`csv.Dialect` instance
+    :param *args: passed on to :class:`csv.DictWriter()`
+    :param **kwargs: passed on to :class:`csv.DictWriter()`
 
     """
-    csv_writer = csv.DictWriter(csv_fileh, fieldnames, dialect=dialect,
-            *args, **kwargs)
-    csv_writer.writerow(dict(zip(fieldnames, fieldnames)))
+    csv_writer = csv.DictWriter(csvfile, fieldnames, *args, **kwargs)
+    csv_writer.writeheader()
     return csv_writer
+
+
+def make_simple_tsv_dict_writer(
+        tsvfileh,
+        fieldnames,
+        *args,
+        **kwargs
+    ):
+    """Similar to :func:`make_csv_dict_writer`, but uses the
+    :class:`SimpleTsvDialect` as the dialect.
+
+    :param tsvfile: a file handle to a TSV file opened in write mode
+    :param fieldnames: a list of field names for the columns
+    :param *args: passed on to :class:`csv.DictWriter()`
+    :param **kwargs: passed on to :class:`csv.DictWriter()`
+
+    """
+    return make_csv_dict_writer(
+            tsvfileh,
+            fieldnames,
+            dialect=SimpleTsvDialect,
+            *args,
+            **kwargs
+    )
 
 
 def append_to_file_base_name(path, addition):
@@ -93,7 +130,7 @@ def append_to_file_base_name(path, addition):
 
     """
     basename, extension = os.path.splitext(path)
-    new_name = "%s%s%s" % (basename, addition, extension)
+    new_name = '{}{}{}'.format(basename, addition, extension)
     return new_name
 
 

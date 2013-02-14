@@ -12,24 +12,30 @@ Typically, the user will want to import one or the other, e.g.::
   from convutils import convutils
 
 
+#############
 ``convutils``
-=============
+#############
 
 ``convutils`` provides the following classes:
 
-* ``ExcelTabNewlineDialect`` is similar to the ``csv.excel_tab``
-  dialect, but uses the newline character (``'\n'``) as the line
-  separator, giving a more Unix-friendly tsv (tab-separated values)
-  format.
+* ``SimpleTsvDialect`` is similar to the ``csv.excel_tab`` dialect, but
+  uses the newline character (``'\n'``) as the line separator, and does
+  no special quoting, giving a more Unix-friendly tsv (tab-separated
+  values) format. (*New in v2.0: formerly ExcelTabNewlineDialect.*)
 
 ``convutils`` also provides the following functions:
 
 * ``make_csv_reader`` creates a ``csv.DictReader`` or ``csv.Reader``
   instance with the convenience of the user not having to explicitly
   specify the CSV dialect.
+* ``make_simple_tsv_reader`` is similar to ``make_csv_reader``, but
+  always uses ``SimpleTsvDialect``. (*New in v2.0.*)
 * ``make_csv_dict_writer`` creates a ``csv.DictWriter`` instance with
   the convenience of not having to manually enter the header row
-  yourself; uses ``ExcelTabNewlineDialect`` as the dialect, by default.
+  yourself; uses ``csv.excel`` as the dialect, by default.
+* ``make_simple_tsv_dict_writer`` is similar to
+  ``make_csv_dict_writer``, but uses the ``SimpleTsvDialect`` instead.
+  (*New in v2.0.*)
 * ``append_to_file_base_name`` will return a modified file name given
   an original one and a string between the base name and the extension
   (e.g., ``append_to_file_base_name('myfile.txt', '-2')`` returns
@@ -53,8 +59,9 @@ Typically, the user will want to import one or the other, e.g.::
   version 1.1.*)
 
 
+###############
 ``convstructs``
-===============
+###############
 
 ``convstructs`` provides two convenient data structures, both
 specialized subclasses of Python's ``dict``.
@@ -68,8 +75,9 @@ specialized subclasses of Python's ``dict``.
   associated.
 
 
+############
 Installation
-============
+############
 
 Installation is easy with `pip`_; simply run ::
 
@@ -78,8 +86,9 @@ Installation is easy with `pip`_; simply run ::
 .. _pip: http://pypi.python.org/pypi/pip
 
 
+############
 Availability
-============
+############
 
 * PyPI page: http://pypi.python.org/pypi/ConvUtils/
 * GitHub project page: https://github.com/gotgenes/python-ConvUtils
