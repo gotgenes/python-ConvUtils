@@ -146,45 +146,6 @@ def count_lines(fileh):
     return num_lines
 
 
-def split_file_by_parts(filename, num_parts, header=False):
-    """Divides a file into the given number of parts.
-
-    The new files will be of the form BASENAME-NUM.EXTENSION, where
-    BASENAME and EXTENSION are derived from the original file, and NUM
-    is the iteration of the split during which the new file was created.
-
-    If the number of lines of the original file is not perfectly
-    divisible by the number of parts, fewer parts may be
-    produced (e.g., If the given file has 10 lines and 6 parts are
-    asked, only 5 will be produced), and the final file may have fewer
-    lines than the previous (e.g., if the original file has 156 lines
-    and 5 parts are asked, the first 4 parts will have 32 lines, and the
-    final fifth part will have 28).
-
-    :param filename: the path to a file
-    :param num_parts: number of parts to divide the file into
-    :param header: whether the original file has a header line; if
-        ``True``, header will be replicated in all new files
-
-    """
-    fileh = open(filename)
-    total_lines = count_lines(fileh)
-    fileh.close()
-    if header:
-        total_lines -= 1
-
-    lines_per_part = int(total_lines / num_parts)
-    if lines_per_part < 1:
-        lines_per_part = 1
-    if total_lines % num_parts:
-        # If we cannot perfectly divide all lines among the number of
-        # parts, we'll divide the file evenly among the first n - 1
-        # parts and then write out the remaining to the nth file.
-        lines_per_part += 1
-
-    split_file_by_num_lines(filename, lines_per_part, header)
-
-
 def _read_file_chunk(infile, lines_per_part):
     lines = []
     for j, line in enumerate(infile):
@@ -244,6 +205,62 @@ def split_file_by_num_lines(
         outfile.close()
         outfile_num += 1
         lines = _read_file_chunk(infile, lines_per_part)
+
+
+def split_file_by_parts(
+        infile,
+        max_num_parts,
+        header=False,
+        pad_file_names=False,
+        num_lines_total=None
+    ):
+    """Divides a file into the given number of parts.
+
+    The new files will be of the form ``<basename>-<num>.<extension>``,
+    where ``<basename>`` and ``<extension>`` are derived from the
+    original file, and ``<num>`` is the iteration of the split during
+    which the new file was created.
+
+    If the number of lines of the original file (minus the header line)
+    is not perfectly divisible by the number of parts, fewer parts may
+    be produced (e.g., If the given file has 10 lines and 6 parts are
+    asked, only 5 will be produced), and the final file may have fewer
+    lines than the previous (e.g., if the original file has 156 lines
+    and 5 parts are asked, the first 4 parts will have 32 lines, and the
+    final fifth part will have 28).
+
+    :param infile: a file handle
+    :param num_parts: number of parts to divide the file into
+    :param header: whether the original file has a header line; if
+        ``True``, header will be replicated in all new files
+    :pad_file_names: provide zero-padding for the ``<num>`` in the
+        output file names; requires counting all the lines in ``infile``
+        unless ``num_lines_total`` is provided (default: ``False``)
+    :num_lines_total: the total number of lines in ``infile``; useful
+        only in conjunction with ``pad_file_names``
+
+
+    """
+    if not num_lines_total:
+        num_lines_total = count_lines(infile)
+    num_lines_total = count_lines(infile)
+    if header:
+        num_lines_total -= 1
+
+    lines_per_part = int(num_lines_total // max_num_parts)
+    if num_lines_total % max_num_parts:
+        # If we cannot perfectly divide all lines among the number of
+        # parts, we'll divide the file evenly among the first n - 1
+        # parts and then write out the remaining to the nth file.
+        lines_per_part += 1
+
+    split_file_by_num_lines(
+            infile,
+            lines_per_part,
+            header,
+            pad_file_names,
+            num_lines_total
+    )
 
 
 def column_args_to_indices(col_str):

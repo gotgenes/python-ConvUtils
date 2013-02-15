@@ -131,10 +131,56 @@ class TestCountLines(unittest.TestCase):
 class SplitFileTestCase(unittest.TestCase):
     """Base class for testing file splitting."""
 
+    def _create_fake_file(self, num_lines, filename='testfile.txt'):
+        lines = ['{}\n'.format(i) for i in range(1, num_lines + 1)]
+        testfile = StringIO(''.join(lines))
+        testfile.name = filename
+        return lines, testfile
+
+
     def setUp(self):
-        self.lines = ['{}\n'.format(i) for i in range(1, 21)]
-        self.testfile = StringIO(''.join(self.lines))
-        self.testfile.name = 'testfile.txt'
+        self.lines, self.testfile = self._create_fake_file(20)
+
+
+    def tearDown(self):
+        FAKEOPEN.reset_mock()
+        FAKEFILE.reset_mock()
+
+
+    def _make_expected_open_calls(self, name_template, num_files):
+        return [
+            call(name_template.format(i), 'w') for i in
+            range(1, num_files + 1)
+        ]
+
+
+    def _make_expected_write_calls(self, lines, lines_per_file,
+                                   header=False):
+        expected_write_calls = []
+        start_line = 1 if header else 0
+        for i in range(start_line, len(lines), lines_per_file):
+            if header:
+                expected_write_calls.append(call.write(self.lines[0]))
+            expected_write_calls.append(
+                    call.writelines(lines[i:i+lines_per_file]))
+            expected_write_calls.append(call.close())
+        return expected_write_calls
+
+
+    def _test_expected_calls_made(
+            self,
+            lines,
+            num_output_files_expected,
+            max_lines_per_file,
+            outfile_template='testfile-{}.txt',
+            header=False
+        ):
+        expected_open_calls = self._make_expected_open_calls(
+                outfile_template, num_output_files_expected)
+        self.assertEqual(FAKEOPEN.call_args_list, expected_open_calls)
+        expected_write_calls = self._make_expected_write_calls(
+                lines, max_lines_per_file, header)
+        self.assertEqual(FAKEFILE.method_calls, expected_write_calls)
 
 
 class TestReadFileChunk(SplitFileTestCase):
@@ -162,57 +208,31 @@ class TestReadFileChunk(SplitFileTestCase):
 class TestSplitFileByNumLines(SplitFileTestCase):
     """Tests for split_file_by_num_lines()"""
 
-    def tearDown(self):
-        FAKEOPEN.reset_mock()
-        FAKEFILE.reset_mock()
-
-
-    def _make_expected_write_calls(self, lines_per_file):
-        expected_write_calls = []
-        for i in range(0, len(self.lines), lines_per_file):
-            expected_write_calls.append(
-                    call.writelines(self.lines[i:i+lines_per_file]))
-            expected_write_calls.append(call.close())
-        return expected_write_calls
-
-
     def test_no_split(self):
         convutils.split_file_by_num_lines(self.testfile, 20)
         FAKEOPEN.assert_called_once_with('testfile-1.txt', 'w')
-        FAKEFILE.assert_has_calls([call.writelines(self.lines)])
+        self.assertEqual(
+                FAKEFILE.method_calls,
+                [call.writelines(self.lines), call.close()]
+        )
 
 
     def test_split_by_five(self):
         convutils.split_file_by_num_lines(self.testfile, 5)
-        FAKEOPEN.assert_has_calls([
-            call('testfile-{}.txt'.format(i), 'w') for i in
-            range(1, 5)
-        ])
-        expected_write_calls = self._make_expected_write_calls(5)
-        FAKEFILE.assert_has_calls(expected_write_calls)
+        self._test_expected_calls_made(self.lines, 4, 5)
 
 
     def test_header(self):
         convutils.split_file_by_num_lines(self.testfile, 5,
                                           header=True)
-        expected_write_calls = []
-        for i in range(1, len(self.lines), 5):
-            expected_write_calls.append(call.write(self.lines[0]))
-            expected_write_calls.append(
-                    call.writelines(self.lines[i:i+5]))
-            expected_write_calls.append(call.close())
-        FAKEFILE.assert_has_calls(expected_write_calls)
+        self._test_expected_calls_made(self.lines, 4, 5, header=True)
 
 
     def test_padding(self):
         convutils.split_file_by_num_lines(self.testfile, 2,
                                           pad_file_names=True)
-        FAKEOPEN.assert_has_calls([
-            call('testfile-{:02}.txt'.format(i), 'w') for i in
-            range(1, 11)
-        ])
-        expected_write_calls = self._make_expected_write_calls(2)
-        FAKEFILE.assert_has_calls(expected_write_calls)
+        self._test_expected_calls_made(self.lines, 10, 2,
+                                       'testfile-{:02}.txt')
 
 
     def test_padding_with_num_total_lines(self):
@@ -222,12 +242,47 @@ class TestSplitFileByNumLines(SplitFileTestCase):
                 pad_file_names=True,
                 num_lines_total=20
         )
-        FAKEOPEN.assert_has_calls([
-            call('testfile-{:02}.txt'.format(i), 'w') for i in
-            range(1, 11)
-        ])
-        expected_write_calls = self._make_expected_write_calls(2)
-        FAKEFILE.assert_has_calls(expected_write_calls)
+        self._test_expected_calls_made(self.lines, 10, 2,
+                                       'testfile-{:02}.txt')
+
+
+@patch(BUILTIN_OPEN, FAKEOPEN)
+class TestSplitFileByParts(SplitFileTestCase):
+    """Tests for split_file_by_parts()"""
+
+    def test_one_part(self):
+        convutils.split_file_by_parts(self.testfile, 1)
+        FAKEOPEN.assert_called_once_with('testfile-1.txt', 'w')
+        self.assertEqual(
+                FAKEFILE.method_calls,
+                [call.writelines(self.lines), call.close()]
+        )
+
+
+    def test_two_parts(self):
+        convutils.split_file_by_parts(self.testfile, 2)
+        self._test_expected_calls_made(self.lines, 2, 10)
+
+
+    def test_three_parts(self):
+        convutils.split_file_by_parts(self.testfile, 3)
+        self._test_expected_calls_made(self.lines, 3, 7)
+
+
+    def test_twelve_parts(self):
+        convutils.split_file_by_parts(self.testfile, 12)
+        self._test_expected_calls_made(self.lines, 10, 2)
+
+
+    def test_ten_lines_six_parts(self):
+        lines, testfile = self._create_fake_file(10)
+        convutils.split_file_by_parts(testfile, 6)
+        self._test_expected_calls_made(lines, 5, 2)
+
+
+    def test_header(self):
+        convutils.split_file_by_parts(self.testfile, 3, header=True)
+        self._test_expected_calls_made(self.lines, 3, 7, header=True)
 
 
 if __name__ == '__main__':
