@@ -9,8 +9,6 @@
 
 """A collection of common utilities and convenient functions."""
 
-from __future__ import unicode_literals
-
 import bisect
 import collections
 import csv
@@ -148,7 +146,7 @@ def count_lines(fileh):
     return num_lines
 
 
-def split_file_by_parts(filename, num_parts, has_header=False):
+def split_file_by_parts(filename, num_parts, header=False):
     """Divides a file into the given number of parts.
 
     The new files will be of the form BASENAME-NUM.EXTENSION, where
@@ -165,14 +163,14 @@ def split_file_by_parts(filename, num_parts, has_header=False):
 
     :param filename: the path to a file
     :param num_parts: number of parts to divide the file into
-    :param has_header: whether the original file has a header line; if
+    :param header: whether the original file has a header line; if
         ``True``, header will be replicated in all new files
 
     """
     fileh = open(filename)
     total_lines = count_lines(fileh)
     fileh.close()
-    if has_header:
+    if header:
         total_lines -= 1
 
     lines_per_part = int(total_lines / num_parts)
@@ -184,49 +182,68 @@ def split_file_by_parts(filename, num_parts, has_header=False):
         # parts and then write out the remaining to the nth file.
         lines_per_part += 1
 
-    split_file_by_num_lines(filename, lines_per_part, has_header)
+    split_file_by_num_lines(filename, lines_per_part, header)
 
 
-def split_file_by_num_lines(filename, lines_per_part, has_header=False):
-    """Divides a file into multiple files of the designated number of
-    lines.
-
-    The new files will be of the form BASENAME-NUM.EXTENSION, where
-    BASENAME and EXTENSION are derived from the original file, and NUM
-    is the iteration of the split during which the new file was created.
-
-    :param filename: the path to a file
-    :param lines_per_part: number of lines per new file (excluding header
-        line, if present)
-    :param has_header: whether the original file has a header line; if
-        ``True``, header will be replicated in all new files
-
-    """
-    fileh = open(filename)
-    if has_header:
-        header = fileh.readline()
-
-    i = 1
+def _read_file_chunk(infile, lines_per_part):
     lines = []
-    for j, line in enumerate(fileh):
+    for j, line in enumerate(infile):
         lines.append(line)
         if j + 1 == lines_per_part:
             break
+    return lines
+
+
+def split_file_by_num_lines(
+        infile,
+        lines_per_part,
+        header=False,
+        pad_file_names=False,
+        num_lines_total=None
+    ):
+    """Divides a file into multiple files of the designated number of
+    lines.
+
+    The new files will be of the form ``<basename>-<num>.<extension>``,
+    where ``<basename>`` and ``<extension>`` are derived from the
+    original file, and ``<num>`` is the iteration of the split during
+    which the new file was created.
+
+    :param infile: a file handle
+    :param lines_per_part: number of lines per new file (excluding header
+        line, if present)
+    :param header: whether the original file has a header line; if
+        ``True``, header will be replicated in all new files
+    :pad_file_names: provide zero-padding for the ``<num>`` in the
+        output file names; requires counting all the lines in ``infile``
+        unless ``num_lines_total`` is provided (default: ``False``)
+    :num_lines_total: the total number of lines in ``infile``; useful
+        only in conjunction with ``pad_file_names``
+
+    """
+    if pad_file_names:
+        if not num_lines_total:
+            num_lines_total = count_lines(infile)
+        padding = len(str(num_lines_total))
+        append_str = '-{{:0{}}}'.format(padding)
+    else:
+        append_str = '-{}'
+
+    if header:
+        header_line = infile.readline()
+
+    outfile_num = 1
+    lines = _read_file_chunk(infile, lines_per_part)
     while lines:
-        outfile_name = append_to_file_base_name(filename, '-part%d' % (
-                i))
+        outfile_name = append_to_file_base_name(
+                infile.name, append_str.format(outfile_num))
         outfile = open(outfile_name, 'w')
-        if has_header:
-            outfile.write(header)
+        if header:
+            outfile.write(header_line)
         outfile.writelines(lines)
         outfile.close()
-        i += 1
-        lines = []
-        for j, line in enumerate(fileh):
-            lines.append(line)
-            if j + 1 == lines_per_part:
-                break
-    fileh.close()
+        outfile_num += 1
+        lines = _read_file_chunk(infile, lines_per_part)
 
 
 def column_args_to_indices(col_str):
