@@ -270,9 +270,9 @@ def column_args_to_indices(col_str):
     indices and slices will be 0-indexed.
 
     :param col_str: a string of column designations (e.g., ``'1-4,6,8'``)
+    :returns: a list of 0-based indices and slices
 
     """
-
     split_cols = col_str.split(',')
     indices = []
     for col_part in split_cols:

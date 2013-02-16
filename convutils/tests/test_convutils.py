@@ -285,6 +285,20 @@ class TestSplitFileByParts(SplitFileTestCase):
         self._test_expected_calls_made(self.lines, 3, 7, header=True)
 
 
+class TestColumnArgsToIndices(unittest.TestCase):
+    """Tests for column_args_to_indices()"""
+
+    def test_column_args_to_indices(self):
+        cases_and_expecteds = (
+            ('5', [4]),
+            ('1-5', [slice(0, 5)]),
+            ('1,3,5-10', [0, 2, slice(4, 10)])
+        )
+        for case, expected in cases_and_expecteds:
+            result = convutils.column_args_to_indices(case)
+            self.assertEqual(result, expected)
+
+
 if __name__ == '__main__':
     unittest.main()
 
