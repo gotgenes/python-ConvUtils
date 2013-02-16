@@ -295,11 +295,10 @@ def cumsum(iterable):
 
     """
     iterable = iter(iterable)
-    s = iterable.next()
-    yield s
-    for c in iterable:
-        s = s + c
-        yield s
+    cum_sum = 0
+    for elem in iterable:
+        cum_sum += elem
+        yield cum_sum
 
 
 def sample_list_dict(d, k):

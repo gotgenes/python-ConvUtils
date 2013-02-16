@@ -299,6 +299,23 @@ class TestColumnArgsToIndices(unittest.TestCase):
             self.assertEqual(result, expected)
 
 
+class TestCumsum(unittest.TestCase):
+    """Tests for cumsum()"""
+
+    def test_cumsum(self):
+        case = [5, 8, 3, 3, 7]
+        expected = [5, 13, 16, 19, 26]
+        result = list(convutils.cumsum(case))
+        self.assertEqual(result, expected)
+
+
+    def test_no_items(self):
+        case = []
+        expected = []
+        result = list(convutils.cumsum(case))
+        self.assertEqual(result, expected)
+
+
 if __name__ == '__main__':
     unittest.main()
 
