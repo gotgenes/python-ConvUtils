@@ -13,7 +13,13 @@ __author__ = 'Chris Lasher'
 __email__ = 'chris DOT lasher <AT> gmail DOT com'
 
 
+from collections import OrderedDict
 import unittest
+
+try:
+    from unittest.mock import call, MagicMock, patch
+except ImportError:
+    from mock import call, MagicMock, patch
 
 from convutils import convstructs
 
@@ -451,6 +457,35 @@ class TwoWaySetDictTests(unittest.TestCase):
         ])
         expected_reverse_dict = {2: set(['b'])}
 
+
+class TestSampleListDict(unittest.TestCase):
+    """Tests for sample_list_dict() and sample_list_dict_low_mem()"""
+
+    def setUp(self):
+        self.case = OrderedDict((
+            ('key1', [1, 5, 9]),
+            ('key2', [6, 42]),
+            ('key3', [7, 9001])
+        ))
+        self.expected = {
+            'key1': [5, 9],
+            'key3': [7]
+        }
+
+
+    def test_sample_list_dict(self):
+        sampled_values = [('key1', 5), ('key1', 9), ('key3', 7)]
+        randmock = MagicMock(return_value=sampled_values)
+        with patch('random.sample', randmock):
+            result = convstructs.sample_list_dict(self.case, 3)
+            self.assertEqual(result, self.expected)
+
+
+    def test_sample_list_dict_low_mem(self):
+        randmock = MagicMock(return_value=[1, 2, 5])
+        with patch('random.sample', randmock):
+            result = convstructs.sample_list_dict_low_mem(self.case, 1)
+            self.assertEqual(result, self.expected)
 
 
 if __name__ == '__main__':
