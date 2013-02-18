@@ -77,6 +77,17 @@ class TestMakeCsvReaders(unittest.TestCase):
         self.assertEqual(result, expected)
 
 
+    def test_no_header(self):
+        result = list(convutils.make_csv_reader(self.testfile1,
+                                                header=False))
+        expected = [
+            ['col1', 'col2', 'col3'],
+            ['this', 'value\tis', 'awesome'],
+            ['this', 'one\tis', 'too']
+        ]
+        self.assertEqual(result, expected)
+
+
 class TestMakeDictWriters(unittest.TestCase):
     """Tests for make_csv_dict_writer() and
     make_simple_tsv_dict_writer()

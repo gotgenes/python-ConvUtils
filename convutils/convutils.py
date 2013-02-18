@@ -28,12 +28,12 @@ class SimpleTsvDialect(csv.excel_tab):
 csv.register_dialect('simple_tsv', SimpleTsvDialect)
 
 
-def make_csv_reader(csvfile, headers=True, dialect=None, *args,
+def make_csv_reader(csvfile, header=True, dialect=None, *args,
                     **kwargs):
     """Creates a CSV reader given a CSV file.
 
     :param csvfile: a file handle to a CSV file
-    :param headers: whether or not the file has headers
+    :param header: whether or not the file has header
     :param dialect: a :class:`csv.Dialect` instance
     :param *args: passed on to the reader
     :param **kwargs: passed on to the reader
@@ -45,7 +45,7 @@ def make_csv_reader(csvfile, headers=True, dialect=None, *args,
         except csv.Error:
             dialect = csv.excel
         csvfile.seek(0)
-    if headers:
+    if header:
         csv_reader = csv.DictReader(csvfile, dialect=dialect, *args,
                 **kwargs)
     else:
@@ -54,16 +54,16 @@ def make_csv_reader(csvfile, headers=True, dialect=None, *args,
     return csv_reader
 
 
-def make_simple_tsv_reader(tsvfile, headers=True, *args, **kwargs):
+def make_simple_tsv_reader(tsvfile, header=True, *args, **kwargs):
     """Creates a CSV reader given a CSV file.
 
     :param tsvfile: a file handle to a TSV file
-    :param headers: whether or not the file has headers
+    :param header: whether or not the file has header
     :param *args: passed on to the reader
     :param **kwargs: passed on to the reader
 
     """
-    return make_csv_reader(tsvfile, headers, dialect=SimpleTsvDialect,
+    return make_csv_reader(tsvfile, header, dialect=SimpleTsvDialect,
                            *args, **kwargs)
 
 

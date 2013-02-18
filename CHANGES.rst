@@ -17,6 +17,8 @@ v2.0
   use the ``csv.excel`` dialect by default, to be more in line with the
   standard library. Added new functions ``make_simple_tsv_reader`` and
   ``make_simple_tsv_dict_writer`` for the previous functionality.
+* Renamed the ``headers`` parameter to ``header`` for
+  ``make_csv_reader`` and ``make_simple_tsv_reader``.
 * Changed the signatures of ``split_file_by_num_lines`` and
   ``split_file_by_parts``. The functions now accept a file handle
   instead of a file name. The parameter ``has_header`` has been renamed
