@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2011 Christopher D. Lasher
+# Copyright (c) 2011,2013 Christopher D. Lasher
 #
 # This software is released under the MIT License. Please see
 # LICENSE.txt for details.
 
 
 """Tests for convstructs.py"""
-
-__author__ = 'Chris Lasher'
-__email__ = 'chris DOT lasher <AT> gmail DOT com'
-
 
 from collections import OrderedDict
 import unittest
@@ -22,6 +18,59 @@ except ImportError:
     from mock import call, MagicMock, patch
 
 from convutils import convstructs
+
+
+class TestSortedTupleKeysDict(unittest.TestCase):
+    """Tests for SortedTupleKeysDict"""
+
+    def setUp(self):
+        self.d = convstructs.SortedTupleKeysDict((
+            ((2, 1), 'x'),
+            (('a',), 'waka'),
+            (('c', 'b'), 'spam')
+        ))
+
+
+    def test_contains(self):
+        self.assertTrue((1, 2) in self.d)
+        self.assertTrue((2, 1) in self.d)
+        self.assertTrue(('a',) in self.d)
+        self.assertTrue(('b', 'c') in self.d)
+        self.assertFalse(('b', 'd') in self.d)
+
+
+    def test_get(self):
+        self.assertEqual(self.d.get(('c', 'b')), 'spam')
+        self.assertEqual(self.d.get(('b', 'c')), 'spam')
+        self.assertEqual(self.d.get(('b', 'd')), None)
+
+
+    def test_getitem(self):
+        self.assertEqual(self.d[('c', 'b')], 'spam')
+        self.assertEqual(self.d[('b', 'c')], 'spam')
+        self.assertEqual(self.d[(2, 1)], 'x')
+
+
+    def test_getitem_raises_key_error(self):
+        with self.assertRaises(KeyError):
+            self.d[('m', 'n')]
+
+
+    def test_setitem(self):
+        self.d[(2, 1)] = 'y'
+        self.assertEqual(self.d[(1, 2)], 'y')
+        self.d[('m', 'n')] = 5
+        self.assertEqual(self.d[('m', 'n')], 5)
+
+
+    def test_del(self):
+        self.assertTrue((1, 2) in self.d)
+        del self.d[(2, 1)]
+        self.assertFalse((1, 2) in self.d)
+
+
+    def test_len(self):
+        self.assertEqual(len(self.d), 3)
 
 
 class TwoWaySetDictTests(unittest.TestCase):

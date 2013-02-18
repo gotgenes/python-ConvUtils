@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2011 Christopher D. Lasher
+# Copyright (c) 2011, 2013 Christopher D. Lasher
 #
 # This software is released under the MIT License. Please see
 # LICENSE.txt for details.
@@ -12,38 +12,50 @@
 from __future__ import absolute_import
 
 import bisect
-import collections
+from collections import defaultdict, MutableMapping
 import random
 
 from convutils.convutils import cumsum
 
 
-class SortedTupleKeysDict(dict):
+class SortedTupleKeysDict(MutableMapping):
     """A dictionary that always sorts the items in its tuple keys."""
 
+    def __init__(self, items=None, **kwargs):
+        if items is not None:
+            items = [(self.__keytransform__(item[0]), item[1]) for item
+                         in items]
+        kwargs = dict((self.__keytransform__(item[0]), item[1]) for item
+                      in kwargs.iteritems())
+        self._store = dict(items, **kwargs)
+
+
+    def __keytransform__(self, key):
+        return tuple(sorted(key))
+
+
     def __contains__(self, key):
-        key = tuple(sorted(key))
-        return super(SortedTupleKeysDict, self).__contains__(key)
-
-
-    def __delitem__(self, key):
-        key = tuple(sorted(key))
-        return super(SortedTupleKeysDict, self).__delitem__(key)
+        return self.__keytransform__(key) in self._store
 
 
     def __getitem__(self, key):
-        key = tuple(sorted(key))
-        return super(SortedTupleKeysDict, self).__getitem__(key)
+        return self._store[self.__keytransform__(key)]
 
 
     def __setitem__(self, key, value):
-        key = tuple(sorted(key))
-        super(SortedTupleKeysDict, self).__setitem__(key, value)
+        self._store[self.__keytransform__(key)] = value
 
 
-    def has_key(self, key):
-        key = tuple(sorted(key))
-        return super(SortedTupleKeysDict, self).has_key(key)
+    def __delitem__(self, key):
+        del self._store[self.__keytransform__(key)]
+
+
+    def __iter__(self):
+        return iter(self._store)
+
+
+    def __len__(self):
+        return len(self._store)
 
 
 class TwoWaySetDict(dict):
@@ -291,7 +303,7 @@ def sample_list_dict(d, k):
         for elem in val:
             flat_dict.append((key, elem))
     sampled_values = random.sample(flat_dict, k)
-    sampled_d = collections.defaultdict(list)
+    sampled_d = defaultdict(list)
     for key, elem in sampled_values:
         sampled_d[key].append(elem)
     return dict(sampled_d)
@@ -335,7 +347,7 @@ def sample_list_dict_low_mem(d, k):
 
     total_num_elements = cum_index_bins[-1]     # total_num_elements == 7
     sampled_indices = random.sample(range(total_num_elements), k)
-    sampled_d = collections.defaultdict(list)
+    sampled_d = defaultdict(list)
     for index in sampled_indices:
         # say index == 3 (the fourth item, ('key2', 6) in this case)
         cum_index = bisect.bisect(cum_index_bins, index)    # cum_index == 2
