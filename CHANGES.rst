@@ -26,6 +26,10 @@ v2.0
   ``num_lines_total`` is provided in addition to ``pad_file_names``,
   ``split_file_by_num_lines`` and ``split_file_by_parts`` will skip
   counting the number of lines in the file, itself, which can save time.
+* ``SortedTupleKeysDict`` and ``TwoWaySetDict`` now subclass
+  ``collections.MutableMapping`` instead of ``dict`` directly due to the
+  suggestions on best-practices from Stack Overflow:
+  http://stackoverflow.com/questions/3387691/python-how-to-perfectly-override-a-dict
 
 .. _mock: http://www.voidspace.org.uk/python/mock/
 

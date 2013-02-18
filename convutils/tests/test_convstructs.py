@@ -31,6 +31,10 @@ class TestSortedTupleKeysDict(unittest.TestCase):
         ))
 
 
+    def test_empty_init(self):
+        convstructs.SortedTupleKeysDict()
+
+
     def test_contains(self):
         self.assertTrue((1, 2) in self.d)
         self.assertTrue((2, 1) in self.d)
@@ -76,13 +80,12 @@ class TestSortedTupleKeysDict(unittest.TestCase):
 class TwoWaySetDictTests(unittest.TestCase):
 
     def setize_kv_pairs(self, kv_pairs):
-        """Helper function to turn `sets` in the values of dictionary
-        key-value pairs (items) into `frozenset`s.
+        """Helper function to turn sets in the values of
+        dictionary key-value pairs (items) into frozensets.
 
-        Returns a `set` of key-value pairs with values as `frozenset`s.
+        Returns a set of key-value pairs with values as frozensets.
 
-        :Parameters:
-        - `kv_pairs`: the key-value pairs from `dict.items()`
+        :param kv_pairs: the key-value pairs from dict.items()
 
         """
         frozen_kv_pairs = ((k, frozenset(v)) for (k, v) in kv_pairs)
@@ -90,26 +93,25 @@ class TwoWaySetDictTests(unittest.TestCase):
         return setized_kv_pairs
 
 
-    def check_items_and_reverse_dict(
+    def check_items_and_reverse_store(
             self,
             two_way_dict,
             expected_items,
-            expected_reverse_dict
+            expected_reverse_store
         ):
         """Check the internals of the two-way dictionary.
 
-        :Parameters:
-        - `two_way_dict`: a `TwoWaySetDict` instance
-        - `expected_items`: a `set` of the expected key-value pairs
-        - `expected_reverse_dict`: a dictionary of what's expected for
-          the `TwoWaySetDict._reverse_dict`
+        :param two_way_dict: a TwoWaySetDict instance
+        :param expected_items: a set of the expected key-value pairs
+        :param expected_reverse_store: a dictionary of what's expected
+            for TwoWaySetDict._reverse_store()
 
         """
         items = self.setize_kv_pairs(two_way_dict.items())
         self.assertEqual(items, expected_items)
         self.assertEqual(
-                two_way_dict._reverse_dict,
-                expected_reverse_dict
+                two_way_dict._reverse_store,
+                expected_reverse_store
         )
 
 
@@ -120,16 +122,16 @@ class TwoWaySetDictTests(unittest.TestCase):
     def test_init_empty(self):
         two_way_dict = convstructs.TwoWaySetDict()
         expected_items = set()
-        expected_reverse_dict = {}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {}
+        self.check_items_and_reverse_store(
                 two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
-    def test_init_bad_arg(self):
-        """Check __init__ raises error if `arg` has a value that's not a
+    def test_init_bad_items(self):
+        """Check __init__ raises error if items has a value that's not a
         set.
 
         """
@@ -153,7 +155,7 @@ class TwoWaySetDictTests(unittest.TestCase):
             raise AssertionError("ValueError not raised")
 
 
-    def test_init_with_arg(self):
+    def test_init_with_items(self):
         two_way_dict = convstructs.TwoWaySetDict(
                 [('a', set([1])), ('b', set([1, 2]))]
         )
@@ -161,11 +163,11 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1])),
                 ('b', frozenset([1, 2]))
         ])
-        expected_reverse_dict = {1: set(['a', 'b']), 2: set(['b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a', 'b']), 2: set(['b'])}
+        self.check_items_and_reverse_store(
                 two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -178,15 +180,15 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1])),
                 ('b', frozenset([1, 2]))
         ])
-        expected_reverse_dict = {1: set(['a', 'b']), 2: set(['b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a', 'b']), 2: set(['b'])}
+        self.check_items_and_reverse_store(
                 two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
-    def test_init_with_arg_and_kwargs(self):
+    def test_init_with_items_and_kwargs(self):
         two_way_dict = convstructs.TwoWaySetDict(
                 [('a', set([3]))],
                 a=set([1]),
@@ -196,11 +198,11 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1])),
                 ('b', frozenset([1, 2]))
         ])
-        expected_reverse_dict = {1: set(['a', 'b']), 2: set(['b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a', 'b']), 2: set(['b'])}
+        self.check_items_and_reverse_store(
                 two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -216,11 +218,11 @@ class TwoWaySetDictTests(unittest.TestCase):
     def test_assign_one_entry(self):
         self.two_way_dict['a'] = set([1])
         expected_items = set([('a', frozenset([1]))])
-        expected_reverse_dict = {1 : set('a')}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1 : set('a')}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -228,11 +230,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set([1, 2])
         self.two_way_dict['a'] = set([2, 3])
         expected_items = set([('a', frozenset([2, 3]))])
-        expected_reverse_dict = {2: set('a'), 3: set('a')}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {2: set('a'), 3: set('a')}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -243,11 +245,11 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1])),
                 ('b', frozenset([2]))
         ])
-        expected_reverse_dict = {1: set(['a']), 2: set(['b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a']), 2: set(['b'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -258,22 +260,22 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1])),
                 ('b', frozenset([1]))
         ])
-        expected_reverse_dict = {1: set(['a', 'b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a', 'b'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
     def test_insert_entry_multiple_values(self):
         self.two_way_dict['a'] = set([1, 2])
         expected_items = set([('a', frozenset([1, 2]))])
-        expected_reverse_dict = {1: set(['a']), 2: set(['a'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a']), 2: set(['a'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -290,11 +292,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set()
         del self.two_way_dict['a']
         expected_items = set()
-        expected_reverse_dict = {}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -302,11 +304,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set([1, 2])
         del self.two_way_dict['a']
         expected_items = set()
-        expected_reverse_dict = {}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -315,11 +317,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['b'] = set([2])
         del self.two_way_dict['a']
         expected_items = set([('b', frozenset([2]))])
-        expected_reverse_dict = {2: set(['b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {2: set(['b'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -331,11 +333,11 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1, 2])),
                 ('b', frozenset([1]))
         ])
-        expected_reverse_dict = {1: set(['a', 'b']), 2: set(['a'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a', 'b']), 2: set(['a'])}
+        self.check_items_and_reverse_store(
                 twd_copy,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -344,11 +346,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['b'] = set([1])
         self.two_way_dict.clear()
         expected_items = set()
-        expected_reverse_dict = {}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -410,11 +412,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set()
         self.two_way_dict.add_item('a', 1)
         expected_items = set([('a', frozenset([1]))])
-        expected_reverse_dict = {1: set(['a'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -422,11 +424,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set([1])
         self.two_way_dict.add_item('a', 2)
         expected_items = set([('a', frozenset([1, 2]))])
-        expected_reverse_dict = {1: set(['a']), 2: set(['a'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a']), 2: set(['a'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -438,11 +440,11 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset([1, 2])),
                 ('b', frozenset([2]))
         ])
-        expected_reverse_dict = {1: set(['a']), 2: set(['a', 'b'])}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {1: set(['a']), 2: set(['a', 'b'])}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -469,11 +471,11 @@ class TwoWaySetDictTests(unittest.TestCase):
         self.two_way_dict['a'] = set([1])
         self.two_way_dict.remove_item('a', 1)
         expected_items = set([('a', frozenset())])
-        expected_reverse_dict = {}
-        self.check_items_and_reverse_dict(
+        expected_reverse_store = {}
+        self.check_items_and_reverse_store(
                 self.two_way_dict,
                 expected_items,
-                expected_reverse_dict
+                expected_reverse_store
         )
 
 
@@ -485,7 +487,7 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset()),
                 ('b', frozenset([1]))
         ])
-        expected_reverse_dict = {1: set(['b'])}
+        expected_reverse_store = {1: set(['b'])}
 
 
     def test_remove_item_from_all_keys_raises_KeyError(self):
@@ -504,7 +506,31 @@ class TwoWaySetDictTests(unittest.TestCase):
                 ('a', frozenset()),
                 ('b', frozenset([2]))
         ])
-        expected_reverse_dict = {2: set(['b'])}
+        expected_reverse_store = {2: set(['b'])}
+
+
+    def test_len(self):
+        self.assertEqual(len(self.two_way_dict), 0)
+        self.two_way_dict['a'] = set([1, 2])
+        self.two_way_dict['b'] = set([1])
+        self.assertEqual(len(self.two_way_dict), 2)
+
+
+    def test_reverse_items(self):
+        self.two_way_dict['a'] = set([1, 2])
+        self.two_way_dict['b'] = set([1])
+        expected = [(1, set(('a', 'b'))), (2, set(('a'),))]
+        result = list(self.two_way_dict.reverse_iteritems())
+        self.assertEqual(result, expected)
+        result = self.two_way_dict.reverse_items()
+        self.assertEqual(result, expected)
+
+
+    def test_has_item(self):
+        self.two_way_dict['a'] = set([1, 2])
+        self.two_way_dict['b'] = set([1])
+        self.assertTrue(self.two_way_dict.has_item(1))
+        self.assertFalse(self.two_way_dict.has_item(3))
 
 
 class TestSampleListDict(unittest.TestCase):

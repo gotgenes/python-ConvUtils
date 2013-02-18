@@ -25,6 +25,8 @@ class SortedTupleKeysDict(MutableMapping):
         if items is not None:
             items = [(self.__keytransform__(item[0]), item[1]) for item
                          in items]
+        else:
+            items = []
         kwargs = dict((self.__keytransform__(item[0]), item[1]) for item
                       in kwargs.iteritems())
         self._store = dict(items, **kwargs)
@@ -58,29 +60,38 @@ class SortedTupleKeysDict(MutableMapping):
         return len(self._store)
 
 
-class TwoWaySetDict(dict):
+class TwoWaySetDict(MutableMapping):
     """A dictionary that has sets as values, and allows looking up the
     key of any item that is in at least one set within the values.
 
     """
 
-    def __init__(self, arg=None, **kwargs):
-        if arg is None:
-            arg = []
-        super(TwoWaySetDict, self).__init__(arg, **kwargs)
+    def __init__(self, items=None, **kwargs):
+        if items is None:
+            items = []
+        self._store = dict(items, **kwargs)
 
-        self._reverse_dict = {}
-        for key, value in self.iteritems():
+        self._reverse_store = {}
+        for key, value in self._store.iteritems():
             if not isinstance(value, set):
-                raise ValueError("Value %(value)s is not an instance "
-                        "of set in pair (%(key)s, %(value)s)" %
-                        {'key': key, 'value': value}
+                raise ValueError(
+                        "Value %(value)s is not an instance "
+                        "of set in pair ({key}, {value})".format(
+                        key=key, value=value)
                 )
             for item in value:
-                try:
-                    self._reverse_dict[item].add(key)
-                except KeyError:
-                    self._reverse_dict[item] = set([key])
+                self._add_reverse_mapping(key, item)
+
+
+    def _add_reverse_mapping(self, key, value_item):
+        try:
+            self._reverse_store[value_item].add(key)
+        except KeyError:
+            self._reverse_store[value_item] = set([key])
+
+
+    def __getitem__(self, key):
+        return self._store[key]
 
 
     def __setitem__(self, key, value):
@@ -94,18 +105,16 @@ class TwoWaySetDict(dict):
                     self._remove_reverse_mapping(item, key)
 
         for item in value:
-            try:
-                self._reverse_dict[item].add(key)
-            except KeyError:
-                self._reverse_dict[item] = set([key])
-        super(TwoWaySetDict, self).__setitem__(key, value)
+            self._add_reverse_mapping(key, item)
+
+        self._store[key] = value
 
 
     def __delitem__(self, key):
         value = self[key]
         for item in value:
             self._remove_reverse_mapping(item, key)
-        super(TwoWaySetDict, self).__delitem__(key)
+        del self._store[key]
 
 
     def _remove_reverse_mapping(self, reverse_key, key):
@@ -114,9 +123,17 @@ class TwoWaySetDict(dict):
         if it no longer maps to any keys.
 
         """
-        self._reverse_dict[reverse_key].remove(key)
-        if not self._reverse_dict[reverse_key]:
-            del self._reverse_dict[reverse_key]
+        self._reverse_store[reverse_key].remove(key)
+        if not self._reverse_store[reverse_key]:
+            del self._reverse_store[reverse_key]
+
+
+    def __iter__(self):
+        return iter(self._store)
+
+
+    def __len__(self):
+        return len(self._store)
 
 
     def copy(self):
@@ -125,8 +142,8 @@ class TwoWaySetDict(dict):
 
 
     def clear(self):
-        self._reverse_dict.clear()
-        super(TwoWaySetDict, self).clear()
+        self._reverse_store.clear()
+        self._store.clear()
 
 
     def reverse_keys(self):
@@ -136,7 +153,7 @@ class TwoWaySetDict(dict):
         dictionary.
 
         """
-        return self._reverse_dict.keys()
+        return self._reverse_store.keys()
 
 
     def reverse_iterkeys(self):
@@ -146,7 +163,7 @@ class TwoWaySetDict(dict):
         dictionary.
 
         """
-        return self._reverse_dict.iterkeys()
+        return self._reverse_store.iterkeys()
 
 
     def reverse_values(self):
@@ -155,7 +172,7 @@ class TwoWaySetDict(dict):
         These values are sets of the keys in the main dictionary.
 
         """
-        return self._reverse_dict.values()
+        return self._reverse_store.values()
 
 
     def reverse_itervalues(self):
@@ -164,21 +181,21 @@ class TwoWaySetDict(dict):
         These values are sets of the keys in the main dictionary.
 
         """
-        return self._reverse_dict.itervalues()
+        return self._reverse_store.itervalues()
 
 
     def reverse_items(self):
         """Returns a list of tuples for reverse key and value pairs.
 
         """
-        return self._reverse_dict.items()
+        return self._reverse_store.items()
 
 
     def reverse_iteritems(self):
         """Yields individual key-value pairs for the reversed items.
 
         """
-        return self._reverse_dict.iteritems()
+        return self._reverse_store.iteritems()
 
 
     def has_item(self, item):
@@ -192,7 +209,7 @@ class TwoWaySetDict(dict):
           main dictionary's values
 
         """
-        if item in self._reverse_dict:
+        if item in self._reverse_store:
             return True
         else:
             return False
@@ -212,7 +229,7 @@ class TwoWaySetDict(dict):
         :param key: a key of the dictionary
 
         """
-        if key in self._reverse_dict[item]:
+        if key in self._reverse_store[item]:
             return True
         else:
             return False
@@ -228,7 +245,7 @@ class TwoWaySetDict(dict):
         :param item: an item in one of the value sets
 
         """
-        return self._reverse_dict[item]
+        return self._reverse_store[item]
 
 
     def add_item(self, key, item):
@@ -242,9 +259,9 @@ class TwoWaySetDict(dict):
         """
         self[key].add(item)
         try:
-            self._reverse_dict[item].add(key)
+            self._reverse_store[item].add(key)
         except KeyError:
-            self._reverse_dict[item] = set([key])
+            self._reverse_store[item] = set([key])
 
 
     def remove_item(self, key, item):
@@ -272,9 +289,9 @@ class TwoWaySetDict(dict):
         :param item: an item to be removed from all sets of values
 
         """
-        for key in self._reverse_dict[item]:
+        for key in self._reverse_store[item]:
             self[key].remove(item)
-        del self._reverse_dict[item]
+        del self._reverse_store[item]
 
 
     # TODO: implement the following
