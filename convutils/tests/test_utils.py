@@ -7,7 +7,7 @@
 # LICENSE.txt for details.
 
 
-"""Tests for convutils"""
+"""Tests for utils"""
 
 from StringIO import StringIO
 import sys
@@ -18,7 +18,7 @@ try:
 except ImportError:
     from mock import call, MagicMock, patch
 
-from convutils import convutils
+from convutils import utils
 
 
 if sys.version_info[0] < 3:
@@ -45,7 +45,7 @@ class TestMakeCsvReaders(unittest.TestCase):
 
 
     def test_sniffing_comma_delim(self):
-        result = list(convutils.make_csv_reader(self.testfile1))
+        result = list(utils.make_csv_reader(self.testfile1))
         expected = [
             {
                 'col1': 'this',
@@ -62,7 +62,7 @@ class TestMakeCsvReaders(unittest.TestCase):
 
 
     def test_simple_tsv_dialect(self):
-        result = list(convutils.make_simple_tsv_reader(
+        result = list(utils.make_simple_tsv_reader(
                 self.testfile2))
         expected = [
             {
@@ -78,7 +78,7 @@ class TestMakeCsvReaders(unittest.TestCase):
 
 
     def test_no_header(self):
-        result = list(convutils.make_csv_reader(self.testfile1,
+        result = list(utils.make_csv_reader(self.testfile1,
                                                 header=False))
         expected = [
             ['col1', 'col2', 'col3'],
@@ -101,7 +101,7 @@ class TestMakeDictWriters(unittest.TestCase):
                                                     ('3', '4'))]
 
     def test_make_csv_dict_writer(self):
-        writer = convutils.make_csv_dict_writer(
+        writer = utils.make_csv_dict_writer(
                 self.csvfile, self.fieldnames)
         writer.writerows(self.rows)
         self.csvfile.seek(0)
@@ -111,7 +111,7 @@ class TestMakeDictWriters(unittest.TestCase):
 
 
     def test_make_simple_tsv_dict_writer(self):
-        writer = convutils.make_simple_tsv_dict_writer(
+        writer = utils.make_simple_tsv_dict_writer(
                 self.csvfile, self.fieldnames)
         writer.writerows(self.rows)
         self.csvfile.seek(0)
@@ -125,7 +125,7 @@ class TestAppendToFileBaseName(unittest.TestCase):
 
     def test_append_to_file_base_name(self):
         file_name = 'a.file'
-        result = convutils.append_to_file_base_name(file_name, '-ok')
+        result = utils.append_to_file_base_name(file_name, '-ok')
         self.assertEqual(result, 'a-ok.file')
 
 
@@ -134,7 +134,7 @@ class TestCountLines(unittest.TestCase):
 
     def test_count_lines(self):
         testfile = StringIO('1\n2\n3\n')
-        result = convutils.count_lines(testfile)
+        result = utils.count_lines(testfile)
         self.assertEqual(result, 3)
 
 
@@ -197,19 +197,19 @@ class TestReadFileChunk(SplitFileTestCase):
     """Tests for _read_file_chunk()"""
 
     def test_read_three(self):
-        result = convutils._read_file_chunk(self.testfile, 3)
+        result = utils._read_file_chunk(self.testfile, 3)
         expected = self.lines[:3]
         self.assertEqual(result, expected)
 
 
     def test_eof(self):
         self.testfile.read()
-        result = convutils._read_file_chunk(self.testfile, 10)
+        result = utils._read_file_chunk(self.testfile, 10)
         self.assertEqual(result, [])
 
 
     def test_ask_for_more_lines(self):
-        result = convutils._read_file_chunk(self.testfile, 30)
+        result = utils._read_file_chunk(self.testfile, 30)
         expected = self.lines
         self.assertEqual(result, expected)
 
@@ -219,7 +219,7 @@ class TestSplitFileByNumLines(SplitFileTestCase):
     """Tests for split_file_by_num_lines()"""
 
     def test_no_split(self):
-        convutils.split_file_by_num_lines(self.testfile, 20)
+        utils.split_file_by_num_lines(self.testfile, 20)
         FAKEOPEN.assert_called_once_with('testfile-1.txt', 'w')
         self.assertEqual(
                 FAKEFILE.method_calls,
@@ -228,25 +228,25 @@ class TestSplitFileByNumLines(SplitFileTestCase):
 
 
     def test_split_by_five(self):
-        convutils.split_file_by_num_lines(self.testfile, 5)
+        utils.split_file_by_num_lines(self.testfile, 5)
         self._test_expected_calls_made(self.lines, 4, 5)
 
 
     def test_header(self):
-        convutils.split_file_by_num_lines(self.testfile, 5,
+        utils.split_file_by_num_lines(self.testfile, 5,
                                           header=True)
         self._test_expected_calls_made(self.lines, 4, 5, header=True)
 
 
     def test_padding(self):
-        convutils.split_file_by_num_lines(self.testfile, 2,
+        utils.split_file_by_num_lines(self.testfile, 2,
                                           pad_file_names=True)
         self._test_expected_calls_made(self.lines, 10, 2,
                                        'testfile-{:02}.txt')
 
 
     def test_padding_with_num_total_lines(self):
-        convutils.split_file_by_num_lines(
+        utils.split_file_by_num_lines(
                 self.testfile,
                 2,
                 pad_file_names=True,
@@ -261,7 +261,7 @@ class TestSplitFileByParts(SplitFileTestCase):
     """Tests for split_file_by_parts()"""
 
     def test_one_part(self):
-        convutils.split_file_by_parts(self.testfile, 1)
+        utils.split_file_by_parts(self.testfile, 1)
         FAKEOPEN.assert_called_once_with('testfile-1.txt', 'w')
         self.assertEqual(
                 FAKEFILE.method_calls,
@@ -270,28 +270,28 @@ class TestSplitFileByParts(SplitFileTestCase):
 
 
     def test_two_parts(self):
-        convutils.split_file_by_parts(self.testfile, 2)
+        utils.split_file_by_parts(self.testfile, 2)
         self._test_expected_calls_made(self.lines, 2, 10)
 
 
     def test_three_parts(self):
-        convutils.split_file_by_parts(self.testfile, 3)
+        utils.split_file_by_parts(self.testfile, 3)
         self._test_expected_calls_made(self.lines, 3, 7)
 
 
     def test_twelve_parts(self):
-        convutils.split_file_by_parts(self.testfile, 12)
+        utils.split_file_by_parts(self.testfile, 12)
         self._test_expected_calls_made(self.lines, 10, 2)
 
 
     def test_ten_lines_six_parts(self):
         lines, testfile = self._create_fake_file(10)
-        convutils.split_file_by_parts(testfile, 6)
+        utils.split_file_by_parts(testfile, 6)
         self._test_expected_calls_made(lines, 5, 2)
 
 
     def test_header(self):
-        convutils.split_file_by_parts(self.testfile, 3, header=True)
+        utils.split_file_by_parts(self.testfile, 3, header=True)
         self._test_expected_calls_made(self.lines, 3, 7, header=True)
 
 
@@ -305,7 +305,7 @@ class TestColumnArgsToIndices(unittest.TestCase):
             ('1,3,5-10', [0, 2, slice(4, 10)])
         )
         for case, expected in cases_and_expecteds:
-            result = convutils.column_args_to_indices(case)
+            result = utils.column_args_to_indices(case)
             self.assertEqual(result, expected)
 
 
@@ -315,14 +315,14 @@ class TestCumsum(unittest.TestCase):
     def test_cumsum(self):
         case = [5, 8, 3, 3, 7]
         expected = [5, 13, 16, 19, 26]
-        result = list(convutils.cumsum(case))
+        result = list(utils.cumsum(case))
         self.assertEqual(result, expected)
 
 
     def test_no_items(self):
         case = []
         expected = []
-        result = list(convutils.cumsum(case))
+        result = list(utils.cumsum(case))
         self.assertEqual(result, expected)
 
 

@@ -15,7 +15,7 @@ import bisect
 from collections import defaultdict, MutableMapping
 import random
 
-from convutils.convutils import cumsum
+from convutils.utils import cumsum
 
 
 class SortedTupleKeysDict(MutableMapping):

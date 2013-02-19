@@ -6,24 +6,24 @@ ConvUtils provides a small library of convenience functions for dealing
 with a variety of tasks, such as creating CSV readers and writers, and
 convenient data structures, such as a two-way dictionary.
 
-This package provides two modules: ``convutils`` and ``convstructs``.
+This package provides two modules: ``utils`` and ``structs``.
 Typically, the user will want to import one or the other, e.g.::
 
-  from convutils import convutils
+  from convutils import utils
 
 
 #############
-``convutils``
+``utils``
 #############
 
-``convutils`` provides the following classes:
+``utils`` provides the following classes:
 
 * ``SimpleTsvDialect`` is similar to the ``csv.excel_tab`` dialect, but
   uses the newline character (``'\n'``) as the line separator, and does
   no special quoting, giving a more Unix-friendly tsv (tab-separated
   values) format. (*New in v2.0: formerly ExcelTabNewlineDialect.*)
 
-``convutils`` also provides the following functions:
+``utils`` also provides the following functions:
 
 * ``make_csv_reader`` creates a ``csv.DictReader`` or ``csv.Reader``
   instance with the convenience of the user not having to explicitly
@@ -50,20 +50,14 @@ Typically, the user will want to import one or the other, e.g.::
   columns (e.g., ``'1-4,6,8'``) and converts it into actual indices
   and slices of an indexable Python sequence.
 * ``cumsum`` produces the cumulative sum of any iterable whose elements
-  support the add operator. (*New in version 1.1.*)
-* ``sample_list_dict`` is like ``random.sample`` but for dictionaries
-  whose values are lists or other enumerable, iterable container types.
-  (*New in version 1.1.*)
-* ``sample_list_dict_low_mem`` is similar to ``sample_list_dict`` but
-  has a lower memory consumption for larger dictionaries. (*New in
-  version 1.1.*)
+  support the add operator. (*New in v1.1.*)
 
 
 ###############
-``convstructs``
+``structs``
 ###############
 
-``convstructs`` provides two convenient data structures, both
+``structs`` provides two convenient data structures, both
 specialized subclasses of Python's ``dict``.
 
 * ``SortedTupleKeysDict`` is a dictionary which expects 2-tuples as
@@ -73,6 +67,16 @@ specialized subclasses of Python's ``dict``.
   and will store a reverse lookup dictionary to tell you, for each set
   in the values that some item belongs to, the keys with which item is
   associated.
+
+``structs`` also provides two functions for sampling Python
+dictionaries whose values are lists:
+
+* ``sample_list_dict`` is like ``random.sample`` but for dictionaries
+  whose values are lists or other enumerable, iterable container types.
+  (*New in v1.1; relocated to* ``structs`` *in v2.0.*)
+* ``sample_list_dict_low_mem`` is similar to ``sample_list_dict`` but
+  has a lower memory consumption for larger dictionaries. (*New in
+  v1.1; relocated to* ``structs`` *in v2.0.*)
 
 
 ############

@@ -43,6 +43,7 @@ setup(
         ],
         description=("A library of convenient utility functions and "
                      "pure Python data structures."),
-        long_description=open('README.rst').read(),
+        long_description=(open('README.rst').read() +
+                          open('CHANGES.rst').read()),
 )
 

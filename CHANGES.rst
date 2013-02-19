@@ -5,12 +5,13 @@ CHANGELOG
 v2.0
 ====
 
-* Made compatible with Python 3 via 2to3 during installation.
+* Refactored code for Python 3 compatibility via 2to3 during installation.
 * Dropped compatibility for Python 2 versions less than 2.7.
-* Refactored code for Python 2.7 and Python 3 compatibility.
 * Added dependency on `mock`_ for unit tests. This dependency is
   satisfied by the standard library for Python 3.3 and newer.
-* Added unit tests for ``convutils.convutils``.
+* Renamed ``convutils.convutils`` to ``convutils.utils``; renamed
+  ``convutils.convstructs`` to ``convutils.structs``.
+* Added unit tests for ``convutils.utils``.
 * Renamed ``ExcelTabNewlineDialect`` to ``SimpleTsvDialect``, and
   changed its quoting style to no quoting.
 * Refactored ``make_csv_reader`` and ``make_simple_tsv_dict_writer`` to
@@ -32,6 +33,8 @@ v2.0
   ``collections.MutableMapping`` instead of ``dict`` directly due to the
   suggestions on best-practices from Stack Overflow:
   http://stackoverflow.com/questions/3387691/python-how-to-perfectly-override-a-dict
+* Relocated ``sample_list_dict`` and ``sample_list_dict_low_mem`` to
+  ``convutils.structs``.
 
 .. _mock: http://www.voidspace.org.uk/python/mock/
 

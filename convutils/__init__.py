@@ -7,5 +7,5 @@
 # LICENSE.txt for details.
 
 from ._version import __version__
-from . import convstructs, convutils
+from . import structs, utils
 

@@ -7,7 +7,7 @@
 # LICENSE.txt for details.
 
 
-"""Tests for convstructs.py"""
+"""Tests for structs.py"""
 
 from collections import OrderedDict
 import unittest
@@ -17,14 +17,14 @@ try:
 except ImportError:
     from mock import call, MagicMock, patch
 
-from convutils import convstructs
+from convutils import structs
 
 
 class TestSortedTupleKeysDict(unittest.TestCase):
     """Tests for SortedTupleKeysDict"""
 
     def setUp(self):
-        self.d = convstructs.SortedTupleKeysDict((
+        self.d = structs.SortedTupleKeysDict((
             ((2, 1), 'x'),
             (('a',), 'waka'),
             (('c', 'b'), 'spam')
@@ -32,7 +32,7 @@ class TestSortedTupleKeysDict(unittest.TestCase):
 
 
     def test_empty_init(self):
-        convstructs.SortedTupleKeysDict()
+        structs.SortedTupleKeysDict()
 
 
     def test_contains(self):
@@ -116,11 +116,11 @@ class TwoWaySetDictTests(unittest.TestCase):
 
 
     def setUp(self):
-        self.two_way_dict = convstructs.TwoWaySetDict()
+        self.two_way_dict = structs.TwoWaySetDict()
 
 
     def test_init_empty(self):
-        two_way_dict = convstructs.TwoWaySetDict()
+        two_way_dict = structs.TwoWaySetDict()
         expected_items = set()
         expected_reverse_store = {}
         self.check_items_and_reverse_store(
@@ -137,7 +137,7 @@ class TwoWaySetDictTests(unittest.TestCase):
         """
         self.assertRaises(
                 ValueError,
-                convstructs.TwoWaySetDict,
+                structs.TwoWaySetDict,
                 [('a', set([1])), ('b', 2)]
         )
 
@@ -148,7 +148,7 @@ class TwoWaySetDictTests(unittest.TestCase):
 
         """
         try:
-            convstructs.TwoWaySetDict(a=set([1]), b=2)
+            structs.TwoWaySetDict(a=set([1]), b=2)
         except ValueError:
             pass
         else:
@@ -156,7 +156,7 @@ class TwoWaySetDictTests(unittest.TestCase):
 
 
     def test_init_with_items(self):
-        two_way_dict = convstructs.TwoWaySetDict(
+        two_way_dict = structs.TwoWaySetDict(
                 [('a', set([1])), ('b', set([1, 2]))]
         )
         expected_items = set([
@@ -172,7 +172,7 @@ class TwoWaySetDictTests(unittest.TestCase):
 
 
     def test_init_with_kwargs(self):
-        two_way_dict = convstructs.TwoWaySetDict(
+        two_way_dict = structs.TwoWaySetDict(
                 a=set([1]),
                 b=set([1, 2])
         )
@@ -189,7 +189,7 @@ class TwoWaySetDictTests(unittest.TestCase):
 
 
     def test_init_with_items_and_kwargs(self):
-        two_way_dict = convstructs.TwoWaySetDict(
+        two_way_dict = structs.TwoWaySetDict(
                 [('a', set([3]))],
                 a=set([1]),
                 b=set([1, 2])
@@ -552,14 +552,14 @@ class TestSampleListDict(unittest.TestCase):
         sampled_values = [('key1', 5), ('key1', 9), ('key3', 7)]
         randmock = MagicMock(return_value=sampled_values)
         with patch('random.sample', randmock):
-            result = convstructs.sample_list_dict(self.case, 3)
+            result = structs.sample_list_dict(self.case, 3)
             self.assertEqual(result, self.expected)
 
 
     def test_sample_list_dict_low_mem(self):
         randmock = MagicMock(return_value=[1, 2, 5])
         with patch('random.sample', randmock):
-            result = convstructs.sample_list_dict_low_mem(self.case, 1)
+            result = structs.sample_list_dict_low_mem(self.case, 1)
             self.assertEqual(result, self.expected)
 
 
