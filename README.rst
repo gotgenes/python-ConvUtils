@@ -2,6 +2,9 @@
 ConvUtils
 *********
 
+.. image:: https://secure.travis-ci.org/gotgenes/python-ConvUtils.png?branch=master
+   :target: http://travis-ci.org/gotgenes/python-ConvUtils/
+
 ConvUtils provides a small library of convenience functions for dealing
 with a variety of tasks, such as creating CSV readers and writers, and
 convenient data structures, such as a two-way dictionary.
