@@ -32,7 +32,7 @@ setup(
         url='http://pypi.python.org/pypi/ConvUtils/',
         license='MIT License',
         classifiers=[
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 5 - Production/Stable',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: MIT License',
             'Operating System :: OS Independent',
