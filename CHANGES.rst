@@ -35,6 +35,7 @@ v2.0
   http://stackoverflow.com/questions/3387691/python-how-to-perfectly-override-a-dict
 * Relocated ``sample_list_dict`` and ``sample_list_dict_low_mem`` to
   ``convutils.structs``.
+* Added Sphinx-based documentation.
 
 .. _mock: http://www.voidspace.org.uk/python/mock/
 

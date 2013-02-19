@@ -22,6 +22,11 @@ class SortedTupleKeysDict(MutableMapping):
     """A dictionary that always sorts the items in its tuple keys."""
 
     def __init__(self, items=None, **kwargs):
+        """
+        :param items: an iterable of pairs of keys and values; keys
+            should be tuples
+
+        """
         if items is not None:
             items = [(self.__keytransform__(item[0]), item[1]) for item
                          in items]
@@ -67,6 +72,11 @@ class TwoWaySetDict(MutableMapping):
     """
 
     def __init__(self, items=None, **kwargs):
+        """
+        :param items: an iterable of pairs of keys and values; values
+            should be :class:`set` instances
+
+        """
         if items is None:
             items = []
         self._store = dict(items, **kwargs)

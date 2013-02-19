@@ -2,28 +2,27 @@
 ConvUtils
 *********
 
-.. image:: https://secure.travis-ci.org/gotgenes/python-ConvUtils.png?branch=master
-   :target: http://travis-ci.org/gotgenes/python-ConvUtils/
-
 ConvUtils provides a small library of convenience functions for dealing
 with a variety of tasks, such as creating CSV readers and writers, and
 convenient data structures, such as a two-way dictionary.
 
 This package provides two modules: ``utils`` and ``structs``.
-Typically, the user will want to import one or the other, e.g.::
+Typically, the user will want to import one or the other, e.g.
+
+::
 
   from convutils import utils
 
 
-#############
-``utils``
-#############
+#####
+utils
+#####
 
 ``utils`` provides the following classes:
 
 * ``SimpleTsvDialect`` is similar to the ``csv.excel_tab`` dialect, but
   uses the newline character (``'\n'``) as the line separator, and does
-  no special quoting, giving a more Unix-friendly tsv (tab-separated
+  no special quoting, giving a more Unix-friendly TSV (tab-separated
   values) format. (*New in v2.0: formerly ExcelTabNewlineDialect.*)
 
 ``utils`` also provides the following functions:
@@ -56,9 +55,9 @@ Typically, the user will want to import one or the other, e.g.::
   support the add operator. (*New in v1.1.*)
 
 
-###############
-``structs``
-###############
+#######
+structs
+#######
 
 ``structs`` provides two convenient data structures, both
 specialized subclasses of Python's ``dict``.
